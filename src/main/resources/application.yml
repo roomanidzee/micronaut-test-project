@@ -1,0 +1,9 @@
+micronaut:
+
+  application:
+
+    name: micronaut-test
+
+  server:
+
+    port: 8080
