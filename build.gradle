@@ -7,11 +7,13 @@ buildscript {
         aptVersion = "0.21"
         logbackVersion = "1.2.3"
         jacksonVersion = "2.9.9"
+        spekVersion = "2.0.5"
     }
     repositories {
         mavenCentral()
         mavenLocal()
         gradlePluginPortal()
+        maven { url "https://dl.bintray.com/spekframework/spek" }
     }
     dependencies {
         classpath "com.github.jengelman.gradle.plugins:shadow:$shadowVersion"
@@ -40,19 +42,27 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom "io.micronaut:micronaut-bom:$micronautVersion"
+        mavenBom("io.micronaut:micronaut-bom:$micronautVersion")
     }
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-    compile "io.micronaut:micronaut-runtime"
-    compile "io.micronaut:micronaut-http-client"
-    compile "io.micronaut:micronaut-http-server-netty"
-    kapt "io.micronaut:micronaut-inject-java"
-    runtime "ch.qos.logback:logback-classic:$logbackVersion"
-    runtime "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
+    compile("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+    
+    compile("io.micronaut:micronaut-runtime")
+    compile("io.micronaut:micronaut-http-client")
+    compile("io.micronaut:micronaut-http-server-netty")
+    
+    kapt("io.micronaut:micronaut-inject-java")
+    kaptTest("io.micronaut:micronaut-inject-java")
+    
+    runtime("ch.qos.logback:logback-classic:$logbackVersion")
+    runtime("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
+    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
+    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion")
 }
 
 shadowJar {
@@ -61,9 +71,22 @@ shadowJar {
 
 mainClassName = "com.romanidze.micronauttest.application.Application"
 
-run.jvmArgs('-noverify', '-XX:TieredStopAtLevel=1')
+run.jvmArgs('-noverify', '-XX:TieredStopAtLevel=1', '-Xmx200m', '-Xms200m')
+
+test {
+    useJUnitPlatform {
+        includeEngines 'spek2'
+    }
+}
 
 compileKotlin {
+    kotlinOptions {
+        jvmTarget = '11'
+        javaParameters = true
+    }
+}
+
+compileTestKotlin {
     kotlinOptions {
         jvmTarget = '11'
         javaParameters = true

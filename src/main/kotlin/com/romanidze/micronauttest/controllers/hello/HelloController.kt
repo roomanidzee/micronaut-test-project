@@ -1,4 +1,4 @@
-package com.romanidze.micronauttest.controllers
+package com.romanidze.micronauttest.controllers.hello
 
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
@@ -11,7 +11,7 @@ class HelloController {
     @Get("/")
     @Produces(MediaType.TEXT_PLAIN)
     fun index(): String {
-        return "Hello World"
+        return "Категорически приветствую"
     }
 
 }
